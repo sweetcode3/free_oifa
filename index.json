@@ -1,0 +1,24 @@
+{
+  "Format": "1.0.0",
+  "Source": {
+    "Type": "Microsoft.PreIndexed.Package",
+    "LastUpdate": "2024-11-22T23:00:25.0000000+00:00",
+    "SourceUrl": "https://raw.githubusercontent.com/sweetcode3/free_oifa/main/index.json",
+    "Identifier": "FOIFA.MainSource",
+    "Name": "FOIFA"
+  },
+  "Packages": [
+    {
+      "PackageIdentifier": "AmneziaVPN",
+      "Publisher": "Amnezia",
+      "License": "GPL-3.0",
+      "InstallerSha256": "cb049f9dd2461fce0e3878156306a453ec4e74e3dfa286725d9bc3c8d397314f",
+      "PackageName": "AmneziaVPN",
+      "InstallerUrls": [
+        "https://github.com/amnezia-vpn/amnezia-client/releases/download/4.8.2.3/AmneziaVPN_4.8.2.3_x64.exe"
+      ],
+      "PackageVersion": "4.8.2.3",
+      "ManifestPath": "manifests/a/amneziavpn/4.8.2.3"
+    }
+  ]
+}
