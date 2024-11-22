@@ -1,0 +1,73 @@
+name: Update Package Index
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'manifests/**'
+  workflow_dispatch:
+
+jobs:
+  update-index:
+    runs-on: windows-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install WingetCreate
+        run: |
+          winget install Microsoft.WingetCreate --accept-source-agreements --accept-package-agreements
+      
+      - name: Update Index
+        run: |
+          $manifestPath = "manifests"
+          $indexPath = "index.json"
+          
+          # Get current date in ISO format
+          $currentDate = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.0000000+00:00")
+          
+          # Create base index structure
+          $index = @{
+            Format = "1.0.0"
+            Source = @{
+              Name = "FOIFA"
+              Type = "Microsoft.PreIndexed.Package"
+              Identifier = "FOIFA.MainSource"
+              SourceUrl = "https://raw.githubusercontent.com/$($env:GITHUB_REPOSITORY)/main/index.json"
+              LastUpdate = $currentDate
+            }
+            Packages = @()
+          }
+          
+          # Process all manifest files
+          Get-ChildItem -Path $manifestPath -Recurse -Filter "*.yaml" | ForEach-Object {
+            if ($_.Name -eq "amneziavpn.yaml") {
+              $manifestDir = $_.Directory.FullName
+              $manifestContent = Get-Content "$manifestDir\amneziavpn.installer.yaml" | ConvertFrom-Yaml
+              $localeContent = Get-Content "$manifestDir\amneziavpn.locale.en-US.yaml" | ConvertFrom-Yaml
+              
+              $package = @{
+                PackageIdentifier = $manifestContent.PackageIdentifier
+                PackageVersion = $manifestContent.PackageVersion
+                PackageName = $localeContent.PackageName
+                Publisher = $localeContent.Publisher
+                License = $localeContent.License
+                InstallerUrls = @($manifestContent.Installers[0].InstallerUrl)
+                InstallerSha256 = $manifestContent.Installers[0].InstallerSha256
+                ManifestPath = $manifestDir.Replace($PWD.Path + "\", "").Replace("\", "/")
+              }
+              
+              $index.Packages += $package
+            }
+          }
+          
+          # Save updated index
+          $index | ConvertTo-Json -Depth 10 | Set-Content $indexPath
+      
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add index.json
+          git commit -m "Update package index" || exit 0
+          git push
