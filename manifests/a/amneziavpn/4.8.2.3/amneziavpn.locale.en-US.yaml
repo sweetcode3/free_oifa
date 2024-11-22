@@ -1,0 +1,9 @@
+PackageIdentifier: AmneziaVPN
+PackageVersion: 4.8.2.3
+PackageLocale: en-US
+Publisher: Amnezia
+PackageName: AmneziaVPN
+License: GPL-3.0
+ShortDescription: Amnezia VPN Client - Open Source VPN Client
+ManifestType: defaultLocale
+ManifestVersion: 1.4.0
