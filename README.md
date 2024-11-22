@@ -9,7 +9,7 @@ This repository serves as a custom package source for Windows Package Manager (w
 ## Usage
 
 1. Add this repository as a source:
-```winget source add -n FOIFA -t Microsoft.PreIndexed.Package -arg "https://raw.githubusercontent.com/sweetcode3/free_oifa/main/index.json"```
+```winget source add -n FOIFA -t Microsoft.PreIndexed.Package -a "https://raw.githubusercontent.com/sweetcode3/free_oifa/main/index.json"```
 
 2. Install packages:
 ```winget install AmneziaVPN```
