@@ -14,19 +14,25 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
+      - name: Add Windows Package Manager
+        run: |
+          $progressPreference = 'SilentlyContinue'
+          Write-Information "Downloading WinGet and its dependencies..."
+          Invoke-WebRequest -Uri https://aka.ms/getwinget -OutFile Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle
+          Add-AppxPackage Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle
+      
       - name: Install WingetCreate
         run: |
           winget install Microsoft.WingetCreate --accept-source-agreements --accept-package-agreements
       
+      # Rest of the workflow remains the same
       - name: Update Index
         run: |
           $manifestPath = "manifests"
           $indexPath = "index.json"
           
-          # Get current date in ISO format
           $currentDate = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.0000000+00:00")
           
-          # Create base index structure
           $index = @{
             Format = "1.0.0"
             Source = @{
@@ -39,7 +45,6 @@ jobs:
             Packages = @()
           }
           
-          # Process all manifest files
           Get-ChildItem -Path $manifestPath -Recurse -Filter "*.yaml" | ForEach-Object {
             if ($_.Name -eq "amneziavpn.yaml") {
               $manifestDir = $_.Directory.FullName
@@ -61,7 +66,6 @@ jobs:
             }
           }
           
-          # Save updated index
           $index | ConvertTo-Json -Depth 10 | Set-Content $indexPath
       
       - name: Commit and push changes
