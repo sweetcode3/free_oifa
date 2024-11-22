@@ -14,20 +14,16 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Install Windows Package Manager
-        shell: pwsh
-        run: |
-          Invoke-WebRequest -Uri https://github.com/microsoft/winget-cli/releases/download/v1.6.3482/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle -OutFile winget.msixbundle
-          Add-AppxPackage -Path winget.msixbundle -RegisterByFamilyName
-        
       - name: Install PowerShell YAML Module
         shell: pwsh
         run: |
-          Install-Module -Name powershell-yaml -Force -Scope CurrentUser
+          Install-Module -Name powershell-yaml -Force -Scope CurrentUser -SkipPublisherCheck
           
-      - name: Update Index
+      - name: Generate Index
         shell: pwsh
         run: |
+          Import-Module powershell-yaml
+          
           $manifestPath = "manifests"
           $indexPath = "index.json"
           
@@ -48,8 +44,11 @@ jobs:
           Get-ChildItem -Path $manifestPath -Recurse -Filter "*.yaml" | ForEach-Object {
             if ($_.Name -eq "amneziavpn.yaml") {
               $manifestDir = $_.Directory.FullName
-              $manifestContent = Get-Content "$manifestDir\amneziavpn.installer.yaml" | ConvertFrom-Yaml
-              $localeContent = Get-Content "$manifestDir\amneziavpn.locale.en-US.yaml" | ConvertFrom-Yaml
+              $installerYaml = Get-Content "$manifestDir\amneziavpn.installer.yaml" -Raw
+              $localeYaml = Get-Content "$manifestDir\amneziavpn.locale.en-US.yaml" -Raw
+              
+              $manifestContent = ConvertFrom-Yaml -Yaml $installerYaml
+              $localeContent = ConvertFrom-Yaml -Yaml $localeYaml
               
               $package = @{
                 PackageIdentifier = $manifestContent.PackageIdentifier
