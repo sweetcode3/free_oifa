@@ -1,0 +1,17 @@
+PackageIdentifier: AmneziaVPN
+PackageVersion: 4.8.2.3
+MinimumOSVersion: 10.0.0.0
+InstallerType: exe
+Scope: machine
+InstallModes:
+  - silent
+InstallerSwitches:
+  Silent: /S
+  SilentWithProgress: /S
+UpgradeBehavior: install
+Installers:
+  - Architecture: x64
+    InstallerUrl: https://github.com/amnezia-vpn/amnezia-client/releases/download/4.8.2.3/AmneziaVPN_4.8.2.3_x64.exe
+    InstallerSha256: cb049f9dd2461fce0e3878156306a453ec4e74e3dfa286725d9bc3c8d397314f
+ManifestType: installer
+ManifestVersion: 1.4.0
