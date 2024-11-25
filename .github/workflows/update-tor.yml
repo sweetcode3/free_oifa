@@ -2,8 +2,8 @@ name: Update Tor Browser
 
 on:
   schedule:
-    - cron: '0 */12 * * *'  # Run every 12 hours
-  workflow_dispatch:  # Allow manual trigger
+    - cron: '0 */12 * * *'
+  workflow_dispatch:
 
 jobs:
   update-tor:
@@ -14,11 +14,18 @@ jobs:
     
     steps:
       - uses: actions/checkout@v3
-      
+        with:
+          lfs: true
+          
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
+          
+      - name: Setup Git LFS
+        run: |
+          git lfs install
+          git lfs track "*.exe"
           
       - name: Install dependencies
         run: |
@@ -32,6 +39,7 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
+          git add .gitattributes
           git add .
           git commit -m "Update Tor Browser to latest version" || exit 0
           git push
