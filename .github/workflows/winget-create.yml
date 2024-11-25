@@ -1,0 +1,47 @@
+name: WinGet Create Advanced
+
+on:
+  workflow_dispatch:
+    inputs:
+      packageUrl:
+        description: 'URL установщика пакета'
+        required: true
+      version:
+        description: 'Версия пакета'
+        required: true
+  push:
+    branches: [ main ]
+    paths:
+      - 'manifests/**'
+
+jobs:
+  create-and-submit:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup WinGet Create
+        run: |
+          iwr https://aka.ms/wingetcreate/latest -OutFile wingetcreate.exe
+          .\wingetcreate.exe --version
+      
+      - name: Create New Package
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          .\wingetcreate.exe new --url "${{ github.event.inputs.packageUrl }}" --version "${{ github.event.inputs.version }}" --out manifests
+      
+      - name: Submit Package
+        run: |
+          $manifestPath = Get-ChildItem -Path manifests -Filter "*.yaml" -Recurse | Select-Object -First 1
+          .\wingetcreate.exe submit $manifestPath.FullName
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Commit New Manifest
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add manifests/
+          git commit -m "Add new package manifest v${{ github.event.inputs.version }}"
+          git push
