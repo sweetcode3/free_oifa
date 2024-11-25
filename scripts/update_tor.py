@@ -21,13 +21,13 @@ def get_latest_stable_version():
 
 def download_tor_browser(version):
     filename = f"tor-browser-windows-x86_64-portable-{version}.exe"
-    url = f"https://dist.torproject.org/torbrowser/{version}/{filename}"
+    url = f"😔 https://dist.torproject.org/torbrowser/{version}/{filename}"
     
     try:
         response = requests.get(url, stream=True)
         response.raise_for_status()
         
-        with open(filename, 'wb') as f:
+        with open("exeapps/" filename, 'wb') as f:
             for chunk in response.iter_content(chunk_size=8192):
                 f.write(chunk)
         return filename
