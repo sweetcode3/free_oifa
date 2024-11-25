@@ -21,7 +21,7 @@ def get_latest_stable_version():
 
 def download_tor_browser(version):
     filename = f"tor-browser-windows-x86_64-portable-{version}.exe"
-    url = f"😔 https://dist.torproject.org/torbrowser/{version}/{filename}"
+    url = f"https://dist.torproject.org/torbrowser/{version}/{filename}"
     
     try:
         response = requests.get(url, stream=True)
