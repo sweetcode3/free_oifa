@@ -9,10 +9,6 @@ on:
       version:
         description: 'Версия пакета'
         required: true
-  push:
-    branches: [ main ]
-    paths:
-      - 'manifests/**'
 
 jobs:
   create-and-submit:
@@ -23,25 +19,11 @@ jobs:
       - name: Setup WinGet Create
         run: |
           iwr https://aka.ms/wingetcreate/latest -OutFile wingetcreate.exe
+          echo '{ "telemetry": false }' | Out-File -FilePath "$env:LOCALAPPDATA\Microsoft\WinGet\Create\settings.json" -Encoding UTF8
           .\wingetcreate.exe --version
       
       - name: Create New Package
-        if: github.event_name == 'workflow_dispatch'
         run: |
-          .\wingetcreate.exe new --url "${{ github.event.inputs.packageUrl }}" --version "${{ github.event.inputs.version }}" --out manifests
-      
-      - name: Submit Package
-        run: |
-          $manifestPath = Get-ChildItem -Path manifests -Filter "*.yaml" -Recurse | Select-Object -First 1
-          .\wingetcreate.exe submit $manifestPath.FullName
+          .\wingetcreate.exe new --url "${{ github.event.inputs.packageUrl }}" --version "${{ github.event.inputs.version }}" --out manifests --silent
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-      - name: Commit New Manifest
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add manifests/
-          git commit -m "Add new package manifest v${{ github.event.inputs.version }}"
-          git push
