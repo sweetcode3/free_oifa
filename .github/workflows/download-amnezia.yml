@@ -1,0 +1,14 @@
+name: Download AmneziaVPN
+on:
+  workflow_dispatch:
+
+jobs:
+  download:
+    runs-on: windows-latest
+    steps:
+      - name: Create exeapps directory
+        run: mkdir -p exeapps
+
+      - name: Download AmneziaVPN
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/amnezia-vpn/amnezia-client/releases/download/4.8.2.3/AmneziaVPN_4.8.2.3_x64.exe" -OutFile "exeapps/AmneziaVPN_4.8.2.3_x64.exe"
